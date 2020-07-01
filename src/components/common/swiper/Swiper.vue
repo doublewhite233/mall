@@ -1,6 +1,6 @@
 <template>
   <div class="block">
-    <el-carousel height="200px">
+    <el-carousel :height=nowHeight>
       <slot></slot>
     </el-carousel>
   </div>
@@ -14,9 +14,16 @@
 
 
   export default {
-    name: "Swiper"
+    name: "Swiper",
+    props: {
+      nowHeight: {
+        type: String,
+        default: '200px'
+      }
+    }
   }
 </script>
 
 <style scoped>
+
 </style>

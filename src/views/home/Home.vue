@@ -25,7 +25,7 @@
   import HomeFeatureView from "./childComps/HomeFeatureView";
 
   import {getHomeMultidata,getHomeGoods } from "network/home";
-  import {debounce} from "components/common/utils";
+  import {itemListenerMixin} from "../../common/mixin";
 
   export default {
     name: "Home",
@@ -41,9 +41,11 @@
         currentType:'pop',
         isShowBackTop: false,
         tabOffsetTop: 0,
-        isTabFixed: false
+        isTabFixed: false,
+        saveY: 0
       }
     },
+    mixins: [itemListenerMixin],
     components: {
       NavBar,
       TabControl,
@@ -69,12 +71,17 @@
       this.getHomeGoods('sell')
     },
     mounted() {
-      // 图片加载完成事件监听
-      const refresh = debounce(this.$refs.scroll.refresh, 200)
-      // 3.监听item图片加载完成
-      this.$bus.$on('itemImageLoad',() => {
-        refresh()
-      })
+    },
+    activated() {
+      this.$refs.scroll.scrollTo(0,this.saveY,0)
+      this.$refs.scroll.refresh()
+    },
+    deactivated() {
+      // 1.保存Y值
+      this.saveY = this.$refs.scroll.scroll.y
+
+      // 2.取消全局事件监听
+      this.$bus.$off(this.homeItemListener)
     },
     methods: {
       /**
@@ -95,6 +102,7 @@
         }
         this.$refs.tabControl1.currentIndex = index
         this.$refs.tabControl2.currentIndex = index
+        this.$refs.scroll.scrollTo(0,0)
       },
       backClick() {
         this.$refs.scroll.scrollTo(0,0)
