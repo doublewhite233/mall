@@ -10,25 +10,26 @@
       <detail-comment-info :comment-info="commentInfo" ref="comment"></detail-comment-info>
       <goods-list :goods="recommends" ref="recommend"></goods-list>
     </scroll>
-    <detail-bottom-bar></detail-bottom-bar>
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+    <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
   </div>
 </template>
 
 <script>
-  import DetailNavBar from "./childComp/DetailNavBar";
-  import DetailSwiper from "./childComp/DetailSwiper";
-  import DetailBaseInfo from "./childComp/DetailBaseInfo";
-  import DetailShopInfo from "./childComp/DetailShopInfo";
-  import DetailGoodsInfo from "./childComp/DetailGoodsInfo";
-  import DetailParamInfo from "./childComp/DetailParamInfo";
-  import DetailCommentInfo from "./childComp/DetailCommentInfo";
-  import DetailBottomBar from "./childComp/DetailBottomBar";
+  import DetailNavBar from "./childComps/DetailNavBar";
+  import DetailSwiper from "./childComps/DetailSwiper";
+  import DetailBaseInfo from "./childComps/DetailBaseInfo";
+  import DetailShopInfo from "./childComps/DetailShopInfo";
+  import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
+  import DetailParamInfo from "./childComps/DetailParamInfo";
+  import DetailCommentInfo from "./childComps/DetailCommentInfo";
+  import DetailBottomBar from "./childComps/DetailBottomBar";
 
   import Scroll from "components/common/scroll/Scroll";
   import GoodsList from "components/content/goods/GoodsList";
 
   import {getDetail, getRecommend, Goods, Shop, GoodsParam} from "network/detail";
-  import {itemListenerMixin} from "../../common/mixin";
+  import {itemListenerMixin, backTopMixin} from "../../common/mixin";
 
   export default {
     name: "Detail",
@@ -44,7 +45,7 @@
       Scroll,
       GoodsList
     },
-    mixins: [itemListenerMixin],
+    mixins: [itemListenerMixin, backTopMixin],
     data() {
       return {
         id: null,
@@ -115,6 +116,8 @@
         this.$refs.scroll.scrollTo(0,-this.themeTopYs[index],200)
       },
       contentScroll(position) {
+        this.isShowBackTop = (-position.y) > 1000
+
         const positionY = -position.y
 
         for (let i = 0;i < this.themeTopYs.length; i++) {
@@ -124,6 +127,21 @@
             this.$refs.nav.currentIndex = this.currentIndex
           }
         }
+      },
+      addToCart() {
+        // 1.获取购物车需要展示信息
+        const product = {}
+        product.image = this.topImages[0]
+        product.title = this.goods.title;
+        product.desc = this.goods.desc;
+        product.price = this.goods.realPrice;
+        product.id = this.id;
+
+        // 2.将商品加入购物车
+        // this.$store.commit('addCart',product)
+        this.$store.dispatch('addCart',product).then(res =>{
+          this.$toast.show(res, 1500)
+        })
       }
     },
     mounted() {
@@ -136,7 +154,7 @@
 
 <style scoped>
   #detail {
-    position: absolute;
+    position: relative;
     z-index: 9;
     background-color: #fff;
     height: 100vh;
@@ -149,6 +167,9 @@
   }
 
   .content {
-    height: calc(100% - 44px);
+    overflow: hidden;
+    position: absolute;
+    top: 44px;
+    bottom: 53px;
   }
 </style>
