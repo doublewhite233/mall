@@ -1,19 +1,7 @@
-# mall
+# Vue 商城
 
-## Project setup
-```
-npm install
-```
+跟着coderwhy老师完成的Vue商城项目。
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+### 功能
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+商城首页<br>商品分类<br>购物车<br>个人详情页面<br>
